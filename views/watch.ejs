@@ -1,0 +1,77 @@
+<% include include/header.ejs %>
+<a href="/" class="btn_main">메인</a>
+<div class="container room">
+	<div class="status">
+		<% for (i = 0; i < room.player.length; i++) { %>
+			<div class="box">
+				<h3 class="player<%= i %>"><%= room.player[i].nick %></h3>
+				<ul>
+					<li>
+						점수 : <%= room.player[i].score %>
+						<% if (room.player[i].bonus > 0) { %>
+						(+<%= room.player[i].bonus %>)
+						<% } %>
+					</li>
+				</ul>
+			</div>
+		<% } %>
+		<% if (room.round !== 11) { %>
+		<ul>
+			<li>라운드 : <%= room.round %><li>
+		</ul>
+		<% } else { %>
+			<p class="rank">게임 종료</p>
+		<% } %>
+	</div>
+	<div class="board">
+		<div class="wrap_tile">
+			<ul>
+			<% if (room.round > 1) { %>
+				<% for (var t = 0; t < room.player[0].round[room.round - 2].length; t++) { %>
+				<li><img src="/images/<%= room.player[0].round[room.round - 2][t].name %>.jpg" class="drag tile saved pos_<%= room.player[0].round[room.round - 2][t].row %>_<%= room.player[0].round[room.round - 2][t].col %> rotate_<%= room.player[0].round[room.round - 2][t].rotate %>" id="<%= room.player[0].round[room.round - 2][t].row %>_<%= room.player[0].round[room.round - 2][t].col %>" alt="<%= room.player[0].round[room.round - 2][t].name %>" /></li>
+				<% } %>
+			<% } %>
+			</ul>
+		</div>
+		<h3>
+			<%= room.member[0] %>
+			<% var board = room.player[0].board.replace('board_', 'Type ').replace('_', ' ').toUpperCase(); %>
+			(<%= board %>)
+			<span></span>
+		</h3>
+		<table class="mine <%= room.player[0].board %>">
+			<% for (var i = 1; i <= 10; i++) { %>
+			<tr>
+				<% for (var j = 1; j <= 10; j++) { %>
+				<td id="td_<%= i %>_<%= j %>">
+					<span><%= i %>-<%= j %></span>
+				</td>
+				<% } %>
+			</tr>
+			<% } %>
+		</table>
+	</div>
+
+</div>
+<script>
+	$(function() {
+		var posTop = 307;
+		var posLeft = 20;
+		var posValue = 70;
+		if ($(".saved").length > 0) {
+			for (var i = 0; i < $(".saved").length; i++) {
+				$(".saved").eq(i).css({
+					top: posValue * ($(".saved").eq(i).attr("class").split('_')[1] - 1) + posTop,
+					left: posValue * ($(".saved").eq(i).attr("class").split('_')[2].split(' ')[0] - 1) + posLeft
+				});
+				if ($(".saved").eq(i).attr("alt").split("_")[0] + "_" + $(".saved").eq(i).attr("alt").split("_")[1] === "tile_engine") {
+					$(".saved").eq(i).removeClass("tile").addClass("tile_engine");
+				} else if ($(".saved").eq(i).attr("alt").split("_")[0] + "_" + $(".saved").eq(i).attr("alt").split("_")[1] === "tile_option") {
+					$(".saved").eq(i).removeClass("tile").addClass("tile_option");
+				}
+			}
+			$(".saved").fadeIn();
+		}
+	});
+</script>
+<% include include/footer.ejs %>
